@@ -1,3 +1,6 @@
+export const PRODUCT_NAME = 'Aethera';
+export const PRODUCT_DOMAIN = 'aethera.online';
+
 /** True for a `#rgb` or `#rrggbb` hex color string. */
 export function isHexColor(value: string): boolean {
   return /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(value);

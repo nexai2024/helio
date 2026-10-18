@@ -26,7 +26,7 @@ export {
   type AttributionModel,
   type AttributionRow,
 } from './attribution';
-export { isHexColor, readableTextColor } from './branding';
+export { isHexColor, PRODUCT_DOMAIN, PRODUCT_NAME, readableTextColor } from './branding';
 export {
   CHURN_FEATURE_NAMES,
   CHURN_MODEL_FORMATS,

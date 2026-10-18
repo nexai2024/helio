@@ -26,6 +26,8 @@ export interface BlockEmailProps {
   footerText?: string;
   /** Open-tracking pixel, appended after the footer when set. */
   pixelUrl?: string;
+  /** Optional segment IDs the recipient contact belongs to for dynamic block display. */
+  activeSegmentIds?: string[];
 }
 
 const styles = {
@@ -67,6 +69,12 @@ export function BlockEmail({
       <Body style={styles.body}>
         <Container style={styles.container}>
           {document.blocks.map((block) => {
+            if (
+              block.showIfSegmentId &&
+              (!activeSegmentIds || !activeSegmentIds.includes(block.showIfSegmentId))
+            ) {
+              return null;
+            }
             switch (block.type) {
               case 'heading':
                 return (

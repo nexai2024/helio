@@ -53,6 +53,21 @@ export const journeyNodeSchema = z.discriminatedUnion('type', [
   }),
   z.object({
     id: nodeIdSchema,
+    type: z.literal('percentage_split'),
+    /** Multi-branch percentage split paths (e.g. 33/33/34 A/B/C). */
+    branches: z
+      .array(
+        z.object({
+          label: z.string().min(1).max(32),
+          percentage: z.number().int().min(1).max(100),
+        }),
+      )
+      .min(2)
+      .max(10),
+    position: positionSchema.optional(),
+  }),
+  z.object({
+    id: nodeIdSchema,
     type: z.literal('update_trait'),
     key: z.string().trim().min(1).max(100),
     value: z.string().max(200),
