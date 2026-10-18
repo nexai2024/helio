@@ -190,16 +190,28 @@ export function suggestColumnMapping(headers: string[]): ColumnMapping {
   const mapping: ColumnMapping = {};
   let emailTaken = false;
   for (const header of headers) {
-    const key = header.trim().toLowerCase();
-    const known = HEADER_ALIASES[key];
-    if (known === 'email' && !emailTaken) {
+    const key = header.trim().toLowerCase().replace(/[-_]/g, ' ');
+    const known = HEADER_ALIASES[key] ?? HEADER_ALIASES[header.trim().toLowerCase()];
+    if ((known === 'email' || key.includes('email') || key.includes('mail')) && !emailTaken) {
       mapping[header] = 'email';
       emailTaken = true;
-    } else if (known === 'firstName' || known === 'lastName') {
-      mapping[header] = known;
-    } else if (STATUS_HEADERS.has(key) || NEGATIVE_HEADERS.has(key)) {
+    } else if (known === 'firstName' || key.includes('first name') || key.includes('given name')) {
+      mapping[header] = 'firstName';
+    } else if (known === 'lastName' || key.includes('last name') || key.includes('surname')) {
+      mapping[header] = 'lastName';
+    } else if (
+      STATUS_HEADERS.has(key) ||
+      NEGATIVE_HEADERS.has(key) ||
+      key.includes('status') ||
+      key.includes('optout') ||
+      key.includes('unsubscribe')
+    ) {
       mapping[header] = 'status';
-    } else if (COMPANY_HEADERS.has(key)) {
+    } else if (
+      COMPANY_HEADERS.has(key) ||
+      key.includes('company') ||
+      key.includes('organization')
+    ) {
       mapping[header] = 'company';
     } else {
       mapping[header] = 'attribute';
@@ -284,4 +296,20 @@ export function normalizeMappedRows(
   });
 
   return { valid, invalid, duplicates, source, suppressed, companies: [...companies], errors };
+}
+
+/**
+ * Apply time-based decay to a lead score (e.g. subtract decayPoints per week of inactivity).
+ */
+export function applyScoreDecay(
+  currentScore: number,
+  lastActivityAt: Date,
+  now = new Date(),
+  decayPointsPerWeek = 5,
+): number {
+  const diffDays = (now.getTime() - lastActivityAt.getTime()) / (1000 * 60 * 60 * 24);
+  if (diffDays < 7) return currentScore;
+  const weeksInactive = Math.floor(diffDays / 7);
+  const newScore = currentScore - weeksInactive * decayPointsPerWeek;
+  return Math.max(0, newScore);
 }

@@ -255,6 +255,28 @@ export function studioModel(name: string): StudioModel | null {
   return STUDIO_MODELS.find((model) => model.name === name) ?? null;
 }
 
+/** Relation inspection helper for studio model relationships. */
+export function studioModelRelations(
+  modelName: string,
+): Array<{ targetModel: string; foreignKey: string }> {
+  switch (modelName) {
+    case 'contact':
+      return [{ targetModel: 'company', foreignKey: 'companyId' }];
+    case 'deal':
+      return [
+        { targetModel: 'contact', foreignKey: 'contactId' },
+        { targetModel: 'company', foreignKey: 'companyId' },
+      ];
+    case 'task':
+      return [
+        { targetModel: 'contact', foreignKey: 'contactId' },
+        { targetModel: 'deal', foreignKey: 'dealId' },
+      ];
+    default:
+      return [];
+  }
+}
+
 function fieldSchema(field: StudioField): z.ZodTypeAny {
   switch (field.type) {
     case 'number':

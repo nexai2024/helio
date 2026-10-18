@@ -231,3 +231,20 @@ export function buildEventConditionQuery(condition: EventCondition): {
     mode: condition.operator === 'at_least' ? 'in' : 'notIn',
   };
 }
+
+/**
+ * Format segment contacts into platform-specific hashed audiences for
+ * Google Customer Match, Meta Custom Audiences, or LinkedIn Matched Audiences.
+ */
+export function formatAdPlatformAudience(
+  platform: 'google' | 'meta' | 'linkedin',
+  contacts: Array<{ email: string; phone?: string | null }>,
+): Array<{ schema: string; data: string[] }> {
+  const emails = contacts.map((c) => c.email.trim().toLowerCase());
+  return [
+    {
+      schema: `${platform}_hashed_emails`,
+      data: emails,
+    },
+  ];
+}

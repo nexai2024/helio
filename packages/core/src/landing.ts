@@ -36,6 +36,23 @@ export type LandingDocument = z.infer<typeof landingDocumentSchema>;
 export const LANDING_BLOCK_TYPES = ['heading', 'text', 'image', 'button', 'form'] as const;
 
 /** A sensible empty block of the given type for the builder to insert. */
+export const formFieldSchema = z.object({
+  id: z.string().min(1).max(64),
+  type: z.enum(['text', 'email', 'phone', 'select', 'checkbox']),
+  label: z.string().trim().min(1).max(100),
+  placeholder: z.string().trim().max(100).optional(),
+  required: z.boolean().default(false),
+  options: z.array(z.string().trim().min(1).max(100)).optional(),
+});
+export type FormField = z.infer<typeof formFieldSchema>;
+
+export const formDocumentSchema = z.object({
+  title: z.string().trim().min(1).max(160),
+  submitLabel: z.string().trim().min(1).max(80).default('Submit'),
+  fields: z.array(formFieldSchema).min(1).max(30),
+});
+export type FormDocument = z.infer<typeof formDocumentSchema>;
+
 export function emptyLandingBlock(type: LandingBlockType): LandingBlock {
   switch (type) {
     case 'heading':
