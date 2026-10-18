@@ -61,6 +61,7 @@ export function BlockEmail({
   unsubscribeUrl,
   footerText,
   pixelUrl,
+  activeSegmentIds,
 }: BlockEmailProps) {
   return (
     <Html lang="en">

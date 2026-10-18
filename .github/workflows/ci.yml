@@ -101,12 +101,6 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      # Bring the core stack up via the project's OWN compose so the containers
-      # are named exactly as locally (helio-postgres-1, …): several specs assert
-      # DB state with `docker exec helio-postgres-1 psql`, which GitHub Actions
-      # `services:` can't satisfy. Mirrors `task verify:e2e` (which needs `task up`).
-      - name: Start the core stack (Postgres + Redis + Mailpit)
-        run: docker compose --env-file .env.example -f infra/compose/docker-compose.yml --profile core up -d --wait
       # Ephemeral per-run secrets — nothing sensitive lives in the workflow.
       # Lengths satisfy the env schema (auth >= 32, unsubscribe >= 24); the
       # base64 key lets the credential-vault specs exercise their real path.
