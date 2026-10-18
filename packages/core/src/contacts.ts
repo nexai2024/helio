@@ -313,3 +313,12 @@ export function applyScoreDecay(
   const newScore = currentScore - weeksInactive * decayPointsPerWeek;
   return Math.max(0, newScore);
 }
+
+export const contactAccountMapSchema = z.object({
+  contactId: z.string().min(1),
+  companyId: z.string().min(1),
+  roleTitle: z.string().trim().max(100).optional(),
+  isPrimaryDecisionMaker: z.boolean().default(false),
+  reportsToContactId: z.string().optional(),
+});
+export type ContactAccountMap = z.infer<typeof contactAccountMapSchema>;

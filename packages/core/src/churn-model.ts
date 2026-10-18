@@ -60,3 +60,14 @@ export const CHURN_UPLOAD_EXTENSIONS: Record<Exclude<ChurnModelFormat, 'HTTP'>, 
   ONNX: '.onnx',
   XGBOOST_JSON: '.json',
 };
+
+/** Validate feature input dimension count against expected matrix bounds. */
+export function validateFeatureMappingDimensions(
+  mapping: ChurnFeatureMapping,
+  expectedInputsCount?: number,
+): boolean {
+  if (expectedInputsCount !== undefined && mapping.inputs.length !== expectedInputsCount) {
+    return false;
+  }
+  return mapping.inputs.length > 0;
+}

@@ -89,3 +89,10 @@ export function normalizeDashboardLayout(stored: unknown): DashboardLayout {
   }
   return layout;
 }
+
+export const lockedRoleLayoutSchema = z.object({
+  role: z.enum(['owner', 'admin', 'editor', 'viewer']),
+  layout: dashboardLayoutSchema,
+  locked: z.boolean().default(true),
+});
+export type LockedRoleLayout = z.infer<typeof lockedRoleLayoutSchema>;

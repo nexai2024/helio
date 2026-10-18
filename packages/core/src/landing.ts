@@ -46,10 +46,18 @@ export const formFieldSchema = z.object({
 });
 export type FormField = z.infer<typeof formFieldSchema>;
 
+export const doubleOptInConfigSchema = z.object({
+  enabled: z.boolean().default(false),
+  confirmationSubject: z.string().trim().min(1).max(200).default('Confirm your subscription'),
+  confirmationTemplateId: z.string().optional(),
+});
+export type DoubleOptInConfig = z.infer<typeof doubleOptInConfigSchema>;
+
 export const formDocumentSchema = z.object({
   title: z.string().trim().min(1).max(160),
   submitLabel: z.string().trim().min(1).max(80).default('Submit'),
   fields: z.array(formFieldSchema).min(1).max(30),
+  doubleOptIn: doubleOptInConfigSchema.optional(),
 });
 export type FormDocument = z.infer<typeof formDocumentSchema>;
 

@@ -101,3 +101,10 @@ export function groupTasksByBucket<T extends TaskOrder>(
   for (const bucket of TASK_BUCKETS) groups[bucket].sort(compareTasks);
   return groups;
 }
+
+export const recurringTaskRuleSchema = z.object({
+  frequency: z.enum(['daily', 'weekly', 'monthly']),
+  interval: z.number().int().min(1).max(365).default(1),
+  endAt: z.date().optional(),
+});
+export type RecurringTaskRule = z.infer<typeof recurringTaskRuleSchema>;

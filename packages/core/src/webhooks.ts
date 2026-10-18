@@ -96,3 +96,14 @@ export function endpointsForEvent<T extends { enabled: boolean; events: string[]
 ): T[] {
   return endpoints.filter((endpoint) => endpoint.enabled && endpoint.events.includes(event));
 }
+
+export const webhookDeliveryLogSchema = z.object({
+  id: z.string().min(1),
+  endpointId: z.string().min(1),
+  event: webhookEventSchema,
+  statusCode: z.number().int().min(100).max(599).optional(),
+  success: z.boolean(),
+  error: z.string().optional(),
+  deliveredAt: z.date(),
+});
+export type WebhookDeliveryLog = z.infer<typeof webhookDeliveryLogSchema>;

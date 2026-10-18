@@ -277,6 +277,12 @@ export function quietHoursDelayMs(quiet: QuietHours, now: Date): number {
  * a contact whose best hour is now isn't pushed a full day. Pure for the
  * same reasons as quietHoursDelayMs.
  */
+/** Check if a contact's predicted churn risk exceeds the trigger threshold. */
+export function isChurnTriggerMet(churnRisk: number | null | undefined, threshold = 0.7): boolean {
+  if (churnRisk === null || churnRisk === undefined) return false;
+  return churnRisk >= threshold;
+}
+
 export function sendTimeDelayMs(bestHour: number, now: Date, timezone = 'UTC'): number {
   if (!Number.isInteger(bestHour) || bestHour < 0 || bestHour > 23) return 0;
   const formatter = new Intl.DateTimeFormat('en-GB', {
