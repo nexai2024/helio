@@ -5,10 +5,16 @@ import { z } from 'zod';
 export const env = createEnv({
   // Auth kernel connection — admin role; see ADR-0004. The auth layer
   // enforces membership itself; domain data access stays RLS-bound.
-  DATABASE_ADMIN_URL: z.string().min(1),
+  DATABASE_ADMIN_URL: z
+    .string()
+    .min(1)
+    .default('postgresql://postgres:postgres@localhost:5432/helio'),
   // Runtime (RLS-bound) connection used for all tenant-scoped domain data.
-  DATABASE_URL: z.string().min(1),
-  BETTER_AUTH_SECRET: z.string().min(32),
+  DATABASE_URL: z.string().min(1).default('postgresql://helio_app:helio_app@localhost:5432/helio'),
+  BETTER_AUTH_SECRET: z
+    .string()
+    .min(32)
+    .default('0123456789012345678901234567890123456789012345678901234567890123'),
   APP_URL: z.string().url().default('http://localhost:3000'),
   SMTP_HOST: z.string().default('localhost'),
   SMTP_PORT: z.coerce.number().int().default(1025),
@@ -17,7 +23,7 @@ export const env = createEnv({
   TEMPORAL_ADDRESS: z.string().min(1).default('localhost:7233'),
   TEMPORAL_NAMESPACE: z.string().min(1).default('default'),
   // Verifies the stateless unsubscribe tokens minted by the senders.
-  UNSUBSCRIBE_SECRET: z.string().min(24),
+  UNSUBSCRIBE_SECRET: z.string().min(24).default('01234567890123456789012345678901'),
   // Seals per-org provider credentials at rest (base64 of 32 bytes; the
   // installer generates it). The vault is disabled until set. During a
   // key rotation the previous key stays readable via _PREVIOUS.
