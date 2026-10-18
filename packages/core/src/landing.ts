@@ -61,6 +61,12 @@ export const formDocumentSchema = z.object({
 });
 export type FormDocument = z.infer<typeof formDocumentSchema>;
 
+export const landingPageCnameSchema = z.object({
+  cnameDomain: z.string().trim().lowercase().min(3).max(253),
+  cnameVerified: z.boolean().default(false),
+});
+export type LandingPageCname = z.infer<typeof landingPageCnameSchema>;
+
 export function emptyLandingBlock(type: LandingBlockType): LandingBlock {
   switch (type) {
     case 'heading':

@@ -283,7 +283,12 @@ export function isChurnTriggerMet(churnRisk: number | null | undefined, threshol
   return churnRisk >= threshold;
 }
 
-export function sendTimeDelayMs(bestHour: number, now: Date, timezone = 'UTC'): number {
+export function sendTimeDelayMs(
+  bestHour: number,
+  now: Date,
+  timezone = 'UTC',
+  maxWaitHours?: number,
+): number {
   if (!Number.isInteger(bestHour) || bestHour < 0 || bestHour > 23) return 0;
   const formatter = new Intl.DateTimeFormat('en-GB', {
     timeZone: timezone,
@@ -296,5 +301,10 @@ export function sendTimeDelayMs(bestHour: number, now: Date, timezone = 'UTC'): 
   const target = bestHour * 60;
   if (nowMinutes >= target && nowMinutes < target + 60) return 0; // already in the hour
   const minutesUntil = target >= nowMinutes ? target - nowMinutes : 24 * 60 - nowMinutes + target;
-  return minutesUntil * 60_000;
+  let delay = minutesUntil * 60_000;
+  if (maxWaitHours !== undefined && maxWaitHours > 0) {
+    const maxMs = maxWaitHours * 3600_000;
+    if (delay > maxMs) delay = maxMs;
+  }
+  return delay;
 }

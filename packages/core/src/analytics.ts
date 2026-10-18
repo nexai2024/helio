@@ -48,6 +48,11 @@ export function funnelStepCounts(
 }
 
 /** Pair each step name with its reached count, conversion, and drop-off. */
+export function validateFunnelStepTimeouts(input: FunnelInput): boolean {
+  if (!input.stepTimeoutsSeconds) return true;
+  return input.stepTimeoutsSeconds.length === input.steps.length - 1;
+}
+
 export function funnelReport(steps: string[], reached: number[]): FunnelStep[] {
   const first = reached[0] ?? 0;
   return steps.map((event, index) => {

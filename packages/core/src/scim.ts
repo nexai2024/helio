@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 /**
  * SCIM 2.0 building blocks (RFC 7643/7644) for cross-vendor user
  * provisioning. Pure and runtime-agnostic — the web app's `/scim/v2`
@@ -217,3 +219,11 @@ export async function generateScimToken(): Promise<{ token: string; hash: string
   const token = `scim_${body}`;
   return { token, hash: await hashScimToken(token) };
 }
+
+export const scimSyncEventSchema = z.object({
+  id: z.string().min(1),
+  eventType: z.enum(['user.provisioned', 'user.deprovisioned', 'user.updated']),
+  email: z.string().email(),
+  timestamp: z.date(),
+});
+export type ScimSyncEvent = z.infer<typeof scimSyncEventSchema>;

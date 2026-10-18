@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 /**
  * Pure date-series helpers for the admin reports (G4). Postgres rows come
  * back as bare timestamps; these shape them into dense, ordered series the
@@ -50,3 +52,12 @@ export function mergeDailySeries(
     return row;
   });
 }
+
+export const customReportWidgetSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().trim().min(1).max(120),
+  chartType: z.enum(['line', 'bar', 'pie', 'table']),
+  queryMetric: z.enum(['events', 'sends', 'conversions', 'revenue']),
+  days: z.number().int().min(1).max(365).default(30),
+});
+export type CustomReportWidget = z.infer<typeof customReportWidgetSchema>;

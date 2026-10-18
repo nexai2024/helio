@@ -95,6 +95,23 @@ function resolveToken(path: string, contact: PersonalizationContact): unknown {
 }
 
 /** Tokens present in a document — lets the UI warn about unknown ones. */
+export function evaluateBlockVisibility(
+  block: EmailBlock,
+  activeSegmentIds: string[] = [],
+): boolean {
+  if (!block.showIfSegmentId) return true;
+  return activeSegmentIds.includes(block.showIfSegmentId);
+}
+
+export const collaborationSessionSchema = z.object({
+  documentId: z.string().min(1),
+  userId: z.string().min(1),
+  userName: z.string().min(1),
+  activeBlockId: z.string().optional(),
+  lastSeenAt: z.date(),
+});
+export type CollaborationSession = z.infer<typeof collaborationSessionSchema>;
+
 export function extractTokens(text: string): string[] {
   const tokens = new Set<string>();
   for (const match of text.matchAll(TOKEN_PATTERN)) {

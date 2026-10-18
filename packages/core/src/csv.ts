@@ -70,3 +70,19 @@ export function contactsToCsv(contacts: ContactCsvRow[]): string {
     ]),
   );
 }
+
+export function formatAuditLogsForCsv(
+  logs: Array<{
+    id: string;
+    action: string;
+    actorId: string | null;
+    targetType: string | null;
+    createdAt: Date;
+  }>,
+): string {
+  const header = ['id', 'action', 'actor_id', 'target_type', 'created_at'];
+  return csvDocument(
+    header,
+    logs.map((log) => [log.id, log.action, log.actorId, log.targetType, log.createdAt]),
+  );
+}

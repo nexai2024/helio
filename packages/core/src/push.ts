@@ -23,3 +23,11 @@ export interface PushNotification {
   body: string;
   url?: string;
 }
+
+export const mobileSyncPayloadSchema = z.object({
+  deviceId: z.string().min(1),
+  platform: z.enum(['ios', 'android']),
+  appVersion: z.string().min(1),
+  pushToken: z.string().optional(),
+});
+export type MobileSyncPayload = z.infer<typeof mobileSyncPayloadSchema>;
