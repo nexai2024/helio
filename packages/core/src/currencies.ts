@@ -49,3 +49,27 @@ export function formatMoney(minorUnits: number, currency: string): string {
     return `${(minorUnits / 100).toFixed(2)} ${currency}`;
   }
 }
+
+/** Default exchange rates relative to USD. */
+const DEFAULT_USD_RATES: Record<string, number> = {
+  USD: 1.0,
+  EUR: 0.92,
+  GBP: 0.79,
+  CAD: 1.36,
+  AUD: 1.52,
+  JPY: 155.0,
+};
+
+/** Convert deal amount from source currency to target currency. */
+export function convertCurrencyCents(
+  amountCents: number,
+  fromCurrency: string,
+  toCurrency: string,
+  customRates = DEFAULT_USD_RATES,
+): number {
+  if (fromCurrency === toCurrency) return amountCents;
+  const fromRate = customRates[fromCurrency] ?? 1.0;
+  const toRate = customRates[toCurrency] ?? 1.0;
+  const usdAmount = amountCents / fromRate;
+  return Math.round(usdAmount * toRate);
+}

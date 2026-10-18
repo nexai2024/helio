@@ -23,3 +23,21 @@ export interface WidgetPayload {
 export function widgetEmbedSnippet(scriptUrl: string, writeKey: string): string {
   return `<script async src="${scriptUrl}" data-write-key="${writeKey}"></script>`;
 }
+
+export interface InAppNotificationPayload {
+  id: string;
+  title: string;
+  body: string;
+  ctaLabel?: string | null;
+  ctaUrl?: string | null;
+  createdAt: string;
+  read: boolean;
+}
+
+export function formatInAppBellPayload(notifications: InAppNotificationPayload[]): {
+  unreadCount: number;
+  notifications: InAppNotificationPayload[];
+} {
+  const unreadCount = notifications.filter((n) => !n.read).length;
+  return { unreadCount, notifications };
+}

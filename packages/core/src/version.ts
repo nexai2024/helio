@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 /**
  * Release identity, baked into images at build time (HELIO_VERSION /
  * HELIO_COMMIT build args → env). Source checkouts report "dev" so a
@@ -51,3 +53,12 @@ export function healthPayload(
 ): { status: 'ok'; service: string; version: string; commit: string | null } {
   return { status: 'ok', service, version: helioVersion(env), commit: helioCommit(env) };
 }
+
+export const pluginManifestSchema = z.object({
+  id: z.string().min(1).max(64),
+  name: z.string().trim().min(1).max(100),
+  version: z.string().min(1),
+  author: z.string().trim().min(1).max(100),
+  entryPoint: z.string().trim().min(1).max(200),
+});
+export type PluginManifest = z.infer<typeof pluginManifestSchema>;

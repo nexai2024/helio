@@ -15,6 +15,8 @@ export const funnelInputSchema = z.object({
   steps: z.array(z.string().trim().min(1).max(120)).min(2).max(8),
   /** Conversion window: the whole sequence must complete within this many days. */
   windowDays: z.number().int().min(1).max(90).default(30),
+  /** Optional step-specific max timeout in seconds between step i-1 and step i. */
+  stepTimeoutsSeconds: z.array(z.number().int().positive()).optional(),
 });
 export type FunnelInput = z.infer<typeof funnelInputSchema>;
 
@@ -46,6 +48,11 @@ export function funnelStepCounts(
 }
 
 /** Pair each step name with its reached count, conversion, and drop-off. */
+export function validateFunnelStepTimeouts(input: FunnelInput): boolean {
+  if (!input.stepTimeoutsSeconds) return true;
+  return input.stepTimeoutsSeconds.length === input.steps.length - 1;
+}
+
 export function funnelReport(steps: string[], reached: number[]): FunnelStep[] {
   const first = reached[0] ?? 0;
   return steps.map((event, index) => {

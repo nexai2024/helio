@@ -69,6 +69,10 @@ export function suggestedSpfInclude(kind: string): string | null {
 }
 
 /** The DKIM record is published and carries the expected public key. */
+export function isValidDkimSelector(selector: string): boolean {
+  return /^[a-z0-9][a-z0-9-]{0,62}$/i.test(selector.trim());
+}
+
 export function dkimPasses(txtRecords: readonly string[], publicKey: string): boolean {
   return txtRecords.some((record) => /v=DKIM1/i.test(record) && record.includes(publicKey));
 }

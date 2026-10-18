@@ -11,13 +11,25 @@ const textValue = z.string().max(5000);
 const urlValue = z.string().trim().url().max(2048);
 
 export const emailBlockSchema = z.discriminatedUnion('type', [
-  z.object({ id: z.string().min(1).max(64), type: z.literal('heading'), text: textValue }),
-  z.object({ id: z.string().min(1).max(64), type: z.literal('paragraph'), text: textValue }),
+  z.object({
+    id: z.string().min(1).max(64),
+    type: z.literal('heading'),
+    text: textValue,
+    /** Optional segment ID required to display this block dynamically. */
+    showIfSegmentId: z.string().min(1).max(64).optional(),
+  }),
+  z.object({
+    id: z.string().min(1).max(64),
+    type: z.literal('paragraph'),
+    text: textValue,
+    showIfSegmentId: z.string().min(1).max(64).optional(),
+  }),
   z.object({
     id: z.string().min(1).max(64),
     type: z.literal('button'),
     label: z.string().trim().min(1).max(200),
     url: urlValue,
+    showIfSegmentId: z.string().min(1).max(64).optional(),
   }),
   z.object({
     id: z.string().min(1).max(64),
@@ -30,9 +42,18 @@ export const emailBlockSchema = z.discriminatedUnion('type', [
     align: z.enum(['left', 'center', 'right']).optional(),
     /** Corner rounding in pixels. */
     radius: z.number().int().min(0).max(32).optional(),
+    showIfSegmentId: z.string().min(1).max(64).optional(),
   }),
-  z.object({ id: z.string().min(1).max(64), type: z.literal('divider') }),
-  z.object({ id: z.string().min(1).max(64), type: z.literal('spacer') }),
+  z.object({
+    id: z.string().min(1).max(64),
+    type: z.literal('divider'),
+    showIfSegmentId: z.string().min(1).max(64).optional(),
+  }),
+  z.object({
+    id: z.string().min(1).max(64),
+    type: z.literal('spacer'),
+    showIfSegmentId: z.string().min(1).max(64).optional(),
+  }),
 ]);
 export type EmailBlock = z.infer<typeof emailBlockSchema>;
 
@@ -74,6 +95,23 @@ function resolveToken(path: string, contact: PersonalizationContact): unknown {
 }
 
 /** Tokens present in a document — lets the UI warn about unknown ones. */
+export function evaluateBlockVisibility(
+  block: EmailBlock,
+  activeSegmentIds: string[] = [],
+): boolean {
+  if (!block.showIfSegmentId) return true;
+  return activeSegmentIds.includes(block.showIfSegmentId);
+}
+
+export const collaborationSessionSchema = z.object({
+  documentId: z.string().min(1),
+  userId: z.string().min(1),
+  userName: z.string().min(1),
+  activeBlockId: z.string().optional(),
+  lastSeenAt: z.date(),
+});
+export type CollaborationSession = z.infer<typeof collaborationSessionSchema>;
+
 export function extractTokens(text: string): string[] {
   const tokens = new Set<string>();
   for (const match of text.matchAll(TOKEN_PATTERN)) {

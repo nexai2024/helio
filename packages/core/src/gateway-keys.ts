@@ -85,3 +85,23 @@ export function scopeAllows(scopes: string[], needed: ApiScope): boolean {
   const [resource, action] = needed.split(':');
   return action === 'read' && scopes.includes(`${resource}:write`);
 }
+
+/** Check if a gateway API key is expired or restricted by client IP. */
+export function validateApiKeyAccess(options: {
+  expiresAt?: Date | null;
+  allowedIps?: string[] | null;
+  clientIp?: string | null;
+}): { allowed: boolean; reason?: string } {
+  if (options.expiresAt && options.expiresAt.getTime() <= Date.now()) {
+    return { allowed: false, reason: 'API key has expired' };
+  }
+  if (options.allowedIps && options.allowedIps.length > 0 && options.clientIp) {
+    const isAllowed = options.allowedIps.some(
+      (ip) => ip === options.clientIp || options.clientIp?.startsWith(ip.replace('/32', '')),
+    );
+    if (!isAllowed) {
+      return { allowed: false, reason: 'Client IP address not whitelisted' };
+    }
+  }
+  return { allowed: true };
+}

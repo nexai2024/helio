@@ -113,3 +113,22 @@ export interface EnrichedEvent {
   /** Server receive time, ISO 8601 UTC. */
   received_at: string;
 }
+
+export const chatMessageSchema = z.object({
+  id: z.string().min(1),
+  channel: z.enum(['SMS', 'WHATSAPP']),
+  direction: z.enum(['INBOUND', 'OUTBOUND']),
+  contactId: z.string().min(1),
+  body: z.string().trim().min(1).max(2000),
+  status: z.enum(['DELIVERED', 'READ', 'FAILED', 'RECEIVED']),
+  createdAt: z.date(),
+});
+export type ChatMessage = z.infer<typeof chatMessageSchema>;
+
+export const eventTransformScriptSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().trim().min(1).max(100),
+  code: z.string().trim().min(1).max(10_000),
+  enabled: z.boolean().default(true),
+});
+export type EventTransformScript = z.infer<typeof eventTransformScriptSchema>;

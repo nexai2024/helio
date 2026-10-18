@@ -53,6 +53,21 @@ export const journeyNodeSchema = z.discriminatedUnion('type', [
   }),
   z.object({
     id: nodeIdSchema,
+    type: z.literal('percentage_split'),
+    /** Multi-branch percentage split paths (e.g. 33/33/34 A/B/C). */
+    branches: z
+      .array(
+        z.object({
+          label: z.string().min(1).max(32),
+          percentage: z.number().int().min(1).max(100),
+        }),
+      )
+      .min(2)
+      .max(10),
+    position: positionSchema.optional(),
+  }),
+  z.object({
+    id: nodeIdSchema,
     type: z.literal('update_trait'),
     key: z.string().trim().min(1).max(100),
     value: z.string().max(200),
@@ -262,7 +277,18 @@ export function quietHoursDelayMs(quiet: QuietHours, now: Date): number {
  * a contact whose best hour is now isn't pushed a full day. Pure for the
  * same reasons as quietHoursDelayMs.
  */
-export function sendTimeDelayMs(bestHour: number, now: Date, timezone = 'UTC'): number {
+/** Check if a contact's predicted churn risk exceeds the trigger threshold. */
+export function isChurnTriggerMet(churnRisk: number | null | undefined, threshold = 0.7): boolean {
+  if (churnRisk === null || churnRisk === undefined) return false;
+  return churnRisk >= threshold;
+}
+
+export function sendTimeDelayMs(
+  bestHour: number,
+  now: Date,
+  timezone = 'UTC',
+  maxWaitHours?: number,
+): number {
   if (!Number.isInteger(bestHour) || bestHour < 0 || bestHour > 23) return 0;
   const formatter = new Intl.DateTimeFormat('en-GB', {
     timeZone: timezone,
@@ -275,5 +301,10 @@ export function sendTimeDelayMs(bestHour: number, now: Date, timezone = 'UTC'): 
   const target = bestHour * 60;
   if (nowMinutes >= target && nowMinutes < target + 60) return 0; // already in the hour
   const minutesUntil = target >= nowMinutes ? target - nowMinutes : 24 * 60 - nowMinutes + target;
-  return minutesUntil * 60_000;
+  let delay = minutesUntil * 60_000;
+  if (maxWaitHours !== undefined && maxWaitHours > 0) {
+    const maxMs = maxWaitHours * 3600_000;
+    if (delay > maxMs) delay = maxMs;
+  }
+  return delay;
 }

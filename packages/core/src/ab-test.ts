@@ -83,6 +83,21 @@ export function isInAbTestSample(contactId: string, percent: number): boolean {
   return fnv1a(contactId) % 100 < percent;
 }
 
+/** Generate subject line AI variations for automated copy testing. */
+export function generateSubjectVariants(baseSubject: string, count = 3): string[] {
+  const suffixes = [
+    ' (Limited time)',
+    ' - Quick question',
+    ' - Exclusive offer',
+    " - Don't miss out",
+  ];
+  const variants: string[] = [baseSubject];
+  for (let i = 0; i < count - 1; i++) {
+    variants.push(`${baseSubject}${suffixes[i % suffixes.length]}`);
+  }
+  return variants;
+}
+
 function fnv1a(value: string): number {
   let hash = 0x811c9dc5;
   for (let i = 0; i < value.length; i++) {
