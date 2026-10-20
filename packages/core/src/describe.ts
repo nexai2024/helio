@@ -90,6 +90,8 @@ function nodeSummary(node: JourneyDefinition['nodes'][number]): string {
       return `If ${describeSegmentCondition(node.condition)}`;
     case 'ab_split':
       return `A/B split ${node.ratioA}/${100 - node.ratioA}`;
+    case 'percentage_split':
+      return `Percentage split (${node.branches.map((b) => `${b.label}: ${b.percentage}%`).join(', ')})`;
     case 'update_trait':
       return `Set ${node.key} = “${node.value}”`;
     case 'webhook':
@@ -104,6 +106,10 @@ function nodeSummary(node: JourneyDefinition['nodes'][number]): string {
       return 'Show in-app message';
     case 'end':
       return 'End';
+    default: {
+      const _exhaustive: never = node;
+      return String(_exhaustive);
+    }
   }
 }
 
